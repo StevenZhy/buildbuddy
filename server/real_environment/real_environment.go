@@ -97,6 +97,7 @@ type RealEnv struct {
 	grpcServer                       *grpc.Server
 	grpcsServer                      *grpc.Server
 	registryServer                   rgpb.RegistryServer
+	flagzEndpoint                    interfaces.FlagzEndpoint
 }
 
 func NewRealEnv(h interfaces.HealthChecker) *RealEnv {
@@ -536,4 +537,12 @@ func (r *RealEnv) GetRegistryServer() rgpb.RegistryServer {
 
 func (r *RealEnv) SetRegistryServer(server rgpb.RegistryServer) {
 	r.registryServer = server
+}
+
+func (r *RealEnv) GetFlagzEndpoint() interfaces.FlagzEndpoint {
+	return r.flagzEndpoint
+}
+
+func (r *RealEnv) SetFlagzEndpoint(endpoint interfaces.FlagzEndpoint) {
+	r.flagzEndpoint = endpoint
 }

@@ -65,6 +65,20 @@ func IgnoreFilter(flg *flag.Flag) bool {
 	return true
 }
 
+// StructuredFilter is a filter that checks that flags contain dots (in other
+// words, it checks that they are not top-level values in the YAML
+// representation).
+func StructuredFilter(flg *flag.Flag) bool {
+	return strings.Contains(flg.Name, ".")
+}
+
+// UnstructuredFilter is a filter that checks that flags do not contain dots (in
+// other words, it checks that they are top-level values in the YAML
+// representation).
+func UnstructuredFilter(flg *flag.Flag) bool {
+	return !StructuredFilter(flg)
+}
+
 type YAMLTypeAliasable interface {
 	// YAMLTypeAlias returns the type alias we use in YAML for this flag.Value.
 	// Only necessary if the type used for YAML is not the type returned by
@@ -165,6 +179,16 @@ func filterPassthrough(opts []common.DocumentNodeOption) []common.DocumentNodeOp
 	}
 	return ptOpts
 }
+
+type Style yaml.Style
+
+func (f *Style) Transform(in any, n *yaml.Node) {
+	if reflect.ValueOf(in).Kind() != reflect.Map {
+		n.Style = yaml.TaggedStyle | yaml.LiteralStyle
+	}
+}
+
+func (f *Style) Passthrough() bool { return true }
 
 // NewDocumentedMarshalerWithOptions wraps a value such that it can be encoded
 // by YAML, documented with DocumentNode (applying the passed
@@ -325,7 +349,11 @@ func GenerateDocumentedMarshalerFromFlag(flg *flag.Flag) (*DocumentedMarshalerWi
 // SplitDocumentedYAMLFromFlags produces marshaled YAML representing the flags,
 // partitioned into two groups: structured (flags containing dots), and
 // unstructured (flags not containing dots).
-func SplitDocumentedYAMLFromFlags() ([]byte, error) {
+func SplitDocumentedYAMLFromFlags(styles ...yaml.Style) ([]byte, error) {
+	style := (Style)(0)
+	for s := range styles {
+		style |= Style(s)
+	}
 	b := bytes.NewBuffer([]byte{})
 
 	if _, err := b.Write([]byte("# Unstructured settings\n\n")); err != nil {
@@ -333,13 +361,13 @@ func SplitDocumentedYAMLFromFlags() ([]byte, error) {
 	}
 	um, err := GenerateYAMLMapWithValuesFromFlags(
 		GenerateDocumentedMarshalerFromFlag,
-		func(flg *flag.Flag) bool { return !strings.Contains(flg.Name, ".") },
+		UnstructuredFilter,
 		IgnoreFilter,
 	)
 	if err != nil {
 		return nil, err
 	}
-	un, err := DocumentedNode(um)
+	un, err := DocumentedNode(um, &style)
 	if err != nil {
 		return nil, err
 	}
@@ -356,13 +384,13 @@ func SplitDocumentedYAMLFromFlags() ([]byte, error) {
 	}
 	sm, err := GenerateYAMLMapWithValuesFromFlags(
 		GenerateDocumentedMarshalerFromFlag,
-		func(flg *flag.Flag) bool { return strings.Contains(flg.Name, ".") },
+		StructuredFilter,
 		IgnoreFilter,
 	)
 	if err != nil {
 		return nil, err
 	}
-	sn, err := DocumentedNode(sm)
+	sn, err := DocumentedNode(sm, &style)
 	if err != nil {
 		return nil, err
 	}
