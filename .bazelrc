@@ -1,3 +1,12 @@
+
+
+build --bes_results_url=https://app.buildbuddy.io/invocation/
+build --bes_backend=grpcs://remote.buildbuddy.io
+build --remote_cache=grpcs://remote.buildbuddy.io
+build --remote_timeout=3600
+build --remote_executor=grpcs://remote.buildbuddy.io
+build --remote_header=x-buildbuddy-api-key=gXnZ4bKMhgivJ7ET0gdE
+
 # Build with --config=local to send build logs to your local server
 build:local --bes_results_url=http://localhost:8080/invocation/
 build:local --bes_backend=grpc://localhost:1985
