@@ -1,4 +1,10 @@
 
+
+<<<<<<< HEAD
+=======
+
+build --build_metadata=REPO_URL=https://github.com/buildbuddy-io/buildbuddy.git
+
 --build_metadata=COMMIT_SHA=$(git rev-parse HEAD)
 
 build --build_metadata=REPO_URL=https://github.com/buildbuddy-io/buildbuddy.git
@@ -151,3 +157,5 @@ build --build_tag_filters=-docker
 # You can create your own by copying and editing the template-user.bazelrc template:
 # cp template-user.bazelrc user.bazelrc
 try-import %workspace%/user.bazelrc
+
+bazel test //...
