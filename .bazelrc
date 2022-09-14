@@ -1,3 +1,21 @@
+
+--build_metadata=COMMIT_SHA=$(git rev-parse HEAD)
+
+build --build_metadata=REPO_URL=https://github.com/buildbuddy-io/buildbuddy.git
+
+build --build_metadata=VISIBILITY=PUBLIC
+
+build --workspace_status_command=$(pwd)/workspace_status.sh
+
+--build_metadata=branch_main=$(git rev-parse --abbrev-ref HEAD)
+
+build --bes_results_url=https://app.buildbuddy.io/invocation/
+build --bes_backend=grpcs://remote.buildbuddy.io
+build --remote_cache=grpcs://remote.buildbuddy.io
+build --noremote_upload_local_results # Uploads logs & artifacts without writing to cache
+build --remote_timeout=3600
+build --remote_header=x-buildbuddy-api-key=gXnZ4bKMhgivJ7ET0gdE
+
 # Build with --config=local to send build logs to your local server
 build:local --bes_results_url=http://localhost:8080/invocation/
 build:local --bes_backend=grpc://localhost:1985
