@@ -1,4 +1,19 @@
 
+--build_metadata=COMMIT_SHA=$(git rev-parse HEAD)
+
+build --build_metadata=REPO_URL=https://github.com/buildbuddy-io/buildbuddy.git
+
+build --build_metadata=VISIBILITY=PUBLIC
+
+build --workspace_status_command=$(pwd)/workspace_status.sh
+
+--build_metadata=branch_main=$(git rev-parse --abbrev-ref HEAD)
+
+build:ci --build_metadata=ROLE=CI
+
+build --build_metadata=VISIBILITY=PUBLIC
+
+--build_metadata=USER=StevenZhy
 
 build --bes_results_url=https://app.buildbuddy.io/invocation/
 build --bes_backend=grpcs://remote.buildbuddy.io
