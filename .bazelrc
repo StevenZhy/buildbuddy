@@ -17,9 +17,10 @@ build --workspace_status_command=$(pwd)/workspace_status.sh
 build --bes_results_url=https://app.buildbuddy.io/invocation/
 build --bes_backend=grpcs://remote.buildbuddy.io
 build --remote_cache=grpcs://remote.buildbuddy.io
+build --remote_download_toplevel # Helps remove network bottleneck if caching is enabled
 build --remote_timeout=3600
 build --remote_executor=grpcs://remote.buildbuddy.io
-build --remote_header=x-buildbuddy-api-key=gXnZ4bKMhgivJ7ET0gdE
+build --remote_header=x-buildbuddy-api-key=IeS87RjDdmlQ4vZOsRmy
 
 # Build with --config=local to send build logs to your local server
 build:local --bes_results_url=http://localhost:8080/invocation/
